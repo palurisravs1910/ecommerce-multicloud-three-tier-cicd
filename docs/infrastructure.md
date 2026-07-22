@@ -30,13 +30,13 @@
 | 3306 | TCP | tomcat-sg |
 
 ## Jenkins Configuration
-- URL: http://16.113.19.153:8080
+- URL: http://16.113.62.231:8080
 - Tools: JDK 21, Maven 3.9
 - Plugins: Git, GitHub Integration, Pipeline, Deploy to Container
 - Credentials: tomcat-aws-credentials
 
 ## Tomcat Configuration
-- URL: http://16.112.58.237:8080
+- URL: http://16.112.90.159:8080
 - Version: 9.0.120
 - Deploy path: /ecommerce-app
 - Manager user: deployer

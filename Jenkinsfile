@@ -20,7 +20,7 @@ pipeline {
         WAR_FILE        = 'target/ecommerce-app.war'
 
         // Tomcat on AWS (App Tier)
-        TOMCAT_AWS_URL  = 'http://16.112.58.237:8080/manager/text'
+        TOMCAT_AWS_URL  = 'http://16.112.90.159:8080/manager/text'
         TOMCAT_AWS_CRED = 'tomcat-aws-credentials'
 
         DEPLOY_PATH     = '/ecommerce-app'
@@ -88,7 +88,7 @@ pipeline {
                 sh """
                     sleep 10
                     HTTP_CODE=\$(curl -s -o /dev/null -w "%{http_code}" \
-                        http://16.112.58.237:8080${DEPLOY_PATH}/)
+                        http://16.112.90.159:8080${DEPLOY_PATH}/)
                     if [ "\$HTTP_CODE" != "200" ]; then
                         echo "Smoke test FAILED - HTTP \$HTTP_CODE"
                         exit 1
