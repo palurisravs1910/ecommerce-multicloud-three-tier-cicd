@@ -10,8 +10,8 @@ pipeline {
 
     // ---- Tool Declarations ----
     tools {
-        maven 'Maven-3.9'    // Must match Jenkins Global Tool Configuration name
-        jdk   'JDK-11'       // Must match Jenkins Global Tool Configuration name
+        maven 'maven'        // Jenkins Global Tool Configuration name
+        jdk   'jdk-21'       // Jenkins Global Tool Configuration name
     }
 
     // ---- Pipeline-wide Environment Variables ----
