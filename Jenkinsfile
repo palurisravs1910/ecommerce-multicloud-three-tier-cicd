@@ -1,6 +1,6 @@
 // ============================================================
 // Jenkinsfile - E-Commerce CI/CD Pipeline
-// Multi-Cloud: AWS (App Tier) + Azure (Backup/DR)
+// AWS Three-Tier Architecture
 // Stack: GitHub → Jenkins → Maven → WAR → Tomcat
 // ============================================================
 
@@ -10,8 +10,8 @@ pipeline {
 
     // ---- Tool Declarations ----
     tools {
-        maven 'maven'        // Jenkins Global Tool Configuration name
-        jdk   'jdk-21'       // Jenkins Global Tool Configuration name
+        maven 'maven'
+        jdk   'jdk-21'
     }
 
     // ---- Pipeline-wide Environment Variables ----
@@ -21,14 +21,9 @@ pipeline {
 
         // Tomcat on AWS (App Tier)
         TOMCAT_AWS_URL  = 'http://16.112.58.237:8080/manager/text'
-        TOMCAT_AWS_CRED = 'tomcat-aws-credentials'     // Jenkins credential ID
-
-        // Tomcat on Azure (Failover / DR)
-        TOMCAT_AZ_URL   = 'http://your-azure-vm-ip:8080/manager/text'
-        TOMCAT_AZ_CRED  = 'tomcat-azure-credentials'   // Jenkins credential ID
+        TOMCAT_AWS_CRED = 'tomcat-aws-credentials'
 
         DEPLOY_PATH     = '/ecommerce-app'
-        NOTIFY_EMAIL    = 'devops@ecommerce.com'
     }
 
     stages {
@@ -51,27 +46,13 @@ pipeline {
             }
             post {
                 always {
-                    // Publish JUnit test results
                     junit allowEmptyResults: true,
                           testResults: 'target/surefire-reports/*.xml'
                 }
             }
         }
 
-        // ---- Stage 3: Code Quality (SonarQube - optional) ----
-        stage('Code Quality') {
-            when {
-                branch 'main'
-            }
-            steps {
-                echo '==> Running SonarQube analysis...'
-                withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar -Dsonar.projectKey=ecommerce-app'
-                }
-            }
-        }
-
-        // ---- Stage 4: Archive WAR ----
+        // ---- Stage 3: Archive WAR ----
         stage('Archive Artifact') {
             steps {
                 echo '==> Archiving WAR artifact...'
@@ -80,16 +61,10 @@ pipeline {
             }
         }
 
-        // ---- Stage 5: Deploy to AWS Tomcat ----
+        // ---- Stage 4: Deploy to AWS Tomcat ----
         stage('Deploy to AWS') {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'release/*'
-                }
-            }
             steps {
-                echo '==> Deploying to AWS Tomcat (App Tier)...'
+                echo '==> Deploying to AWS Tomcat...'
                 withCredentials([usernamePassword(
                     credentialsId: "${TOMCAT_AWS_CRED}",
                     usernameVariable: 'TOMCAT_USER',
@@ -106,40 +81,14 @@ pipeline {
             }
         }
 
-        // ---- Stage 6: Deploy to Azure (Failover) ----
-        stage('Deploy to Azure') {
-            when {
-                branch 'main'
-            }
-            steps {
-                echo '==> Deploying to Azure Tomcat (DR/Failover)...'
-                withCredentials([usernamePassword(
-                    credentialsId: "${TOMCAT_AZ_CRED}",
-                    usernameVariable: 'TOMCAT_USER',
-                    passwordVariable: 'TOMCAT_PASS'
-                )]) {
-                    sh """
-                        curl -v --fail \
-                          --upload-file ${WAR_FILE} \
-                          "${TOMCAT_AZ_URL}/deploy?path=${DEPLOY_PATH}&update=true" \
-                          --user "\${TOMCAT_USER}:\${TOMCAT_PASS}"
-                    """
-                }
-                echo '==> Azure deployment complete.'
-            }
-        }
-
-        // ---- Stage 7: Smoke Test ----
+        // ---- Stage 5: Smoke Test ----
         stage('Smoke Test') {
-            when {
-                branch 'main'
-            }
             steps {
-                echo '==> Running smoke test on AWS deployment...'
+                echo '==> Running smoke test...'
                 sh """
                     sleep 10
                     HTTP_CODE=\$(curl -s -o /dev/null -w "%{http_code}" \
-                        http://your-aws-ec2-ip:8080${DEPLOY_PATH}/)
+                        http://16.112.58.237:8080${DEPLOY_PATH}/)
                     if [ "\$HTTP_CODE" != "200" ]; then
                         echo "Smoke test FAILED - HTTP \$HTTP_CODE"
                         exit 1
@@ -155,27 +104,9 @@ pipeline {
     post {
         success {
             echo '==> Pipeline SUCCEEDED.'
-            mail to: "${NOTIFY_EMAIL}",
-                 subject: "SUCCESS: ${APP_NAME} Build #${env.BUILD_NUMBER}",
-                 body: """
-Build #${env.BUILD_NUMBER} completed successfully.
-Branch : ${env.GIT_BRANCH}
-Commit : ${env.GIT_COMMIT}
-URL    : ${env.BUILD_URL}
-"""
         }
         failure {
             echo '==> Pipeline FAILED.'
-            mail to: "${NOTIFY_EMAIL}",
-                 subject: "FAILED: ${APP_NAME} Build #${env.BUILD_NUMBER}",
-                 body: """
-Build #${env.BUILD_NUMBER} FAILED.
-Branch : ${env.GIT_BRANCH}
-Commit : ${env.GIT_COMMIT}
-URL    : ${env.BUILD_URL}
-
-Please check the Jenkins console for details.
-"""
         }
         always {
             echo '==> Cleaning workspace...'
