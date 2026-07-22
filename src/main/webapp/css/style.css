@@ -1,0 +1,121 @@
+/* ============================================================
+   ShopEasy - Global Styles
+   ============================================================ */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* ---- Product Cards ---- */
+.product-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.product-img {
+    height: 200px;
+    object-fit: cover;
+    width: 100%;
+}
+
+/* ---- Category Cards ---- */
+.category-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 12px;
+}
+
+.category-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ---- Navbar ---- */
+.navbar-brand {
+    letter-spacing: 1px;
+}
+
+/* ---- Buttons ---- */
+.btn-dark {
+    background-color: #1a1a2e;
+    border-color: #1a1a2e;
+}
+
+.btn-dark:hover {
+    background-color: #0f3460;
+    border-color: #0f3460;
+}
+
+/* ---- Cards ---- */
+.card {
+    border: none;
+    border-radius: 12px;
+}
+
+.card-header {
+    border-radius: 12px 12px 0 0 !important;
+}
+
+/* ---- Tables ---- */
+.table th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    letter-spacing: 0.03em;
+}
+
+/* ---- Alerts ---- */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+/* ---- Badges ---- */
+.badge {
+    font-weight: 500;
+    padding: 0.4em 0.75em;
+    border-radius: 6px;
+}
+
+/* ---- Stripe Card Element ---- */
+#card-element {
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    transition: border-color 0.2s;
+}
+
+#card-element.StripeElement--focus {
+    border-color: #0f3460;
+    box-shadow: 0 0 0 0.2rem rgba(15, 52, 96, 0.25);
+}
+
+/* ---- Footer ---- */
+footer a:hover {
+    color: #ffc107 !important;
+    transition: color 0.2s;
+}
+
+/* ---- Breadcrumb ---- */
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .product-img {
+        height: 160px;
+    }
+    .hero-banner h1 {
+        font-size: 2rem;
+    }
+}
