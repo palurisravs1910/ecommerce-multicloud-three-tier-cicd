@@ -44,4 +44,14 @@ public class OrderServlet extends HttpServlet {
             req.getRequestDispatcher("/WEB-INF/views/order-history.jsp").forward(req, resp);
         }
     }
+
+    private User getLoggedUser(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("loggedUser") == null) {
+            resp.sendRedirect(req.getContextPath() + "/auth?action=login");
+            return null;
+        }
+        return (User) session.getAttribute("loggedUser");
+    }
 }
