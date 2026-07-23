@@ -4,6 +4,16 @@ All notable changes to this project are documented here.
 
 ---
 
+## [1.3.0] - 2026-07-22
+
+### Added
+- AWS RDS MySQL 8.4.9 connected as managed database tier
+- Database running in private subnet — no public access
+- Schema initialized with all 7 tables and seed data
+- App fully connected to RDS — three-tier architecture complete
+
+---
+
 ## [1.2.0] - 2026-07-22
 
 ### Added

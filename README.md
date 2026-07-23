@@ -287,7 +287,7 @@ For complete step-by-step instructions see [Setup Guide](docs/setup-guide.md).
 - [x] Elastic IPs for stable server addressing
 - [x] Stripe payment integration
 - [x] BCrypt password security
-- [ ] AWS RDS MySQL (managed database tier)
+- [x] AWS RDS MySQL (managed database tier)
 - [ ] HTTPS with AWS Certificate Manager (ACM)
 - [ ] Custom domain with Route 53
 
