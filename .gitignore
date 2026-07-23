@@ -7,9 +7,10 @@ target/
 *.jar
 
 # ============================================================
-# Sensitive configuration - NEVER commit real credentials
+# Sensitive configuration - NEVER commit real credentials in production
+# For this project db.properties is committed with RDS config
 # ============================================================
-src/main/resources/db.properties
+# src/main/resources/db.properties
 
 # ============================================================
 # IDE files
