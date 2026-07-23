@@ -268,13 +268,13 @@ For complete step-by-step instructions see [Setup Guide](docs/setup-guide.md).
 ## Screenshots
 
 ### Application UI
-![App UI](screenshots/app-ui/impo.png)
+![App UI](screenshots/app-ui/imgo.jpg)
 
 ### Jenkins CI/CD Pipeline
-![Jenkins Pipeline](screenshots/jenkins-pipeline/impo.png)
+![Jenkins Pipeline](screenshots/jenkins-pipeline/imgo.jpg)
 
 ### AWS Infrastructure
-![AWS Infrastructure](screenshots/aws-infrastructure/impo.png)
+![AWS Infrastructure](screenshots/aws-infrastructure/imgo.jpg)
 
 ---
 
