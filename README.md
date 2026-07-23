@@ -1,76 +1,75 @@
 # ShopEasy — E-Commerce Three-Tier CI/CD on AWS
 
-A production-grade e-commerce web application built with **Java Servlets + JSP**, deployed on a **three-tier architecture** on **AWS**, with a fully automated **Jenkins CI/CD pipeline**.
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
+![Java](https://img.shields.io/badge/Java-21-orange?logo=java)
+![Maven](https://img.shields.io/badge/Maven-3.9-C71A36?logo=apachemaven)
+![Tomcat](https://img.shields.io/badge/Tomcat-9.0.120-F8DC75?logo=apachetomcat&logoColor=black)
+![Jenkins](https://img.shields.io/badge/Jenkins-CI%2FCD-D24939?logo=jenkins&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-EC2%20%7C%20VPC%20%7C%20ALB%20%7C%20RDS-FF9900?logo=amazonaws)
+![License](https://img.shields.io/badge/License-MIT-blue)
+
+A production-grade e-commerce web application built with **Java Servlets + JSP**, deployed on a
+**three-tier AWS architecture**, with a fully automated **Jenkins CI/CD pipeline** triggered on every GitHub push.
 
 ---
 
-## Screenshots
+## Table of Contents
 
-### Application UI
-![Home Page](screenshots/app-ui/home.png)
-![Products Page](screenshots/app-ui/products.png)
-![Cart Page](screenshots/app-ui/cart.png)
-![Payment Page](screenshots/app-ui/payment.png)
-
-### CI/CD Pipeline
-![Jenkins Pipeline](screenshots/jenkins-pipeline/pipeline-success.png)
-![Jenkins Stages](screenshots/jenkins-pipeline/pipeline-stages.png)
-
-### AWS Infrastructure
-![EC2 Instances](screenshots/aws-infrastructure/ec2-instances.png)
-![VPC Setup](screenshots/aws-infrastructure/vpc.png)
-![ALB Setup](screenshots/aws-infrastructure/alb.png)
-![Security Groups](screenshots/aws-infrastructure/security-groups.png)
-
-### Kiro AI-Assisted Development
-![Kiro Session](screenshots/kiro-ai/kiro-session.png)
-
-> This project was built using **Kiro AI** — an agentic AI software engineer inside the Kiro IDE.
-> All application code, CI/CD pipeline, and infrastructure documentation were generated and refined
-> through AI-assisted prompting, demonstrating the power of combining DevOps expertise with AI tooling.
+- [Architecture](#architecture)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Tech Stack](#tech-stack)
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [AWS Infrastructure](#aws-infrastructure)
+- [Quick Start](#quick-start)
+- [Screenshots](#screenshots)
+- [Roadmap](#roadmap)
+- [Author](#author)
 
 ---
 
-## Architecture Overview
+## Architecture
 
 ```
   Internet
       │
       ▼  HTTP :80
-┌─────────────────────────────────┐
-│   Application Load Balancer     │
-│   (ecommerce-alb)               │
-│   ALB DNS → ecommerce-app       │
-└─────────────────────────────────┘
+┌──────────────────────────────────┐
+│    Application Load Balancer     │
+│    ecommerce-alb                 │
+│    Health checks → /ecommerce-app│
+└──────────────────────────────────┘
       │
-      ▼  HTTP :8080 (internal)
+      ▼  HTTP :8080 (internal only)
 ┌─────────────────────────────────────────────────────────┐
-│                     AWS VPC (10.0.0.0/16)               │
+│                  AWS VPC  10.0.0.0/16                   │
 │                                                         │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │          Public Subnet (10.0.1.0/24)              │  │
-│  │                                                   │  │
-│  │  ┌──────────────┐        ┌────────────────────┐   │  │
-│  │  │ Jenkins EC2  │        │   Tomcat EC2        │   │  │
-│  │  │ t3.medium    │───────▶│   t3.small          │   │  │
-│  │  │ (CI/CD)      │        │   (App Server)      │   │  │
-│  │  └──────────────┘        └────────────────────┘   │  │
-│  └───────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────┐   │
+│  │         Public Subnet  10.0.1.0/24               │   │
+│  │                                                  │   │
+│  │  ┌─────────────────┐    ┌──────────────────────┐ │   │
+│  │  │  Jenkins EC2    │    │    Tomcat EC2         │ │   │
+│  │  │  t3.medium      │───▶│    t3.small           │ │   │
+│  │  │  CI/CD Server   │    │    App Server         │ │   │
+│  │  └─────────────────┘    └──────────────────────┘ │   │
+│  └──────────────────────────────────────────────────┘   │
 │                                                         │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │          Private Subnet (10.0.2.0/24)             │  │
-│  │                                                   │  │
-│  │              ┌─────────────────────┐              │  │
-│  │              │    AWS RDS MySQL     │              │  │
-│  │              │    (Database Tier)   │              │  │
-│  │              └─────────────────────┘              │  │
-│  └───────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────┐   │
+│  │         Private Subnet  10.0.2.0/24              │   │
+│  │                                                  │   │
+│  │           ┌───────────────────────┐              │   │
+│  │           │   AWS RDS MySQL 8.0   │              │   │
+│  │           │   Database Tier       │              │   │
+│  │           └───────────────────────┘              │   │
+│  └──────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## CI/CD Pipeline
+
+Every `git push` to `main` automatically triggers the full pipeline:
 
 ```
 Developer
@@ -79,16 +78,28 @@ Developer
     ▼
 GitHub Repository
     │
-    │  Webhook trigger
+    │  Webhook → Jenkins
     ▼
-Jenkins Pipeline
-    │
-    ├── Stage 1: Checkout        → Pull latest code from GitHub
-    ├── Stage 2: Build & Test    → mvn clean test package
-    ├── Stage 3: Archive WAR     → Save artifact in Jenkins
-    ├── Stage 4: Deploy to AWS   → Push WAR to Tomcat Manager API
-    └── Stage 5: Smoke Test      → Verify HTTP 200 via ALB DNS
+┌─────────────────────────────────────────────┐
+│            Jenkins Pipeline                 │
+│                                             │
+│  Stage 1 → Checkout from GitHub            │
+│  Stage 2 → Maven Build & Test              │
+│  Stage 3 → Archive WAR Artifact            │
+│  Stage 4 → Deploy WAR to Tomcat            │
+│  Stage 5 → Smoke Test via ALB DNS          │
+└─────────────────────────────────────────────┘
 ```
+
+**Build time: ~1 minute end to end**
+
+| Stage | Tool | Output |
+|---|---|---|
+| Checkout | Git | Latest source code |
+| Build & Test | Maven 3.9 | ecommerce-app.war (~14MB) |
+| Archive | Jenkins | Stored build artifact |
+| Deploy | curl + Tomcat Manager API | Live deployment |
+| Smoke Test | curl | HTTP 200 verified |
 
 ---
 
@@ -102,12 +113,12 @@ Jenkins Pipeline
 | Application Server | Apache Tomcat | 9.0.120 |
 | Database | MySQL | 8.0 |
 | Payment Gateway | Stripe API | 23.3.0 |
-| CI/CD Server | Jenkins | 2.x |
+| CI/CD | Jenkins | 2.x |
 | Load Balancer | AWS ALB | - |
 | Cloud | AWS EC2, RDS, VPC, ALB | - |
 | Frontend | Bootstrap 5 + JSTL | 5.3 |
-| Security | BCrypt password hashing | - |
-| Logging | SLF4J + Logback | - |
+| Password Security | BCrypt (jBCrypt) | 0.4 |
+| Logging | SLF4J + Logback | 2.0.9 |
 
 ---
 
@@ -116,14 +127,14 @@ Jenkins Pipeline
 - User registration and login with BCrypt password hashing
 - Product listing, search, and category filtering
 - Shopping cart with real-time quantity management
-- Secure checkout with shipping address
+- Secure checkout with shipping address collection
 - Stripe payment integration with real-time card validation
-- Order history and detailed order view
+- Order history and detailed order view per user
 - Admin panel for product and order management
 - Auth filter protecting all secured routes
 - Responsive UI with Bootstrap 5
 - Custom 404, 403, 500 error pages
-- Character encoding filter for UTF-8 support
+- UTF-8 character encoding filter
 
 ---
 
@@ -136,54 +147,76 @@ ecommerce-multicloud-three-tier-cicd/
 ├── pom.xml                            # Maven build configuration
 ├── README.md                          # Project documentation
 ├── CHANGELOG.md                       # Version history
+├── CONTRIBUTING.md                    # Contribution guide
+├── SECURITY.md                        # Security policy
 ├── LICENSE                            # MIT License
 │
-├── scripts/                           # Server setup scripts
-│   ├── install-jenkins.sh             # Jenkins installation
-│   ├── install-tomcat.sh              # Tomcat installation
-│   └── db-setup.sh                    # Database initialization
+├── scripts/                           # Server automation scripts
+│   ├── install-jenkins.sh
+│   ├── install-tomcat.sh
+│   └── db-setup.sh
 │
 ├── docs/                              # Detailed documentation
-│   ├── setup-guide.md                 # Step-by-step setup guide
-│   ├── ci-cd-pipeline.md              # Pipeline documentation
-│   ├── alb-setup.md                   # ALB + Load Balancer setup
-│   └── infrastructure.md              # AWS infrastructure details
+│   ├── setup-guide.md
+│   ├── ci-cd-pipeline.md
+│   ├── alb-setup.md
+│   └── infrastructure.md
 │
 ├── screenshots/                       # Project screenshots
-│   ├── app-ui/                        # Application UI screenshots
-│   ├── jenkins-pipeline/              # Jenkins pipeline screenshots
-│   ├── aws-infrastructure/            # AWS console screenshots
-│   └── kiro-ai/                       # Kiro AI session screenshots
+│   ├── app-ui/
+│   ├── jenkins-pipeline/
+│   ├── aws-infrastructure/
+│   └── kiro-ai/
 │
-└── src/
-    └── main/
-        ├── java/com/ecommerce/
-        │   ├── controller/            # Servlets (HTTP layer)
-        │   ├── dao/                   # Database access layer
-        │   ├── filter/                # Auth + encoding filters
-        │   ├── model/                 # Domain models
-        │   ├── service/               # Business logic layer
-        │   └── util/                  # DB connection + config
-        ├── resources/
-        │   ├── db.properties.example  # Config template (safe to commit)
-        │   └── schema.sql             # MySQL schema + seed data
-        └── webapp/
-            ├── WEB-INF/
-            │   ├── web.xml
-            │   └── views/             # JSP pages
-            └── css/
-                └── style.css
+└── src/main/
+    ├── java/com/ecommerce/
+    │   ├── controller/                # Servlets - HTTP request handling
+    │   ├── dao/                       # Database access layer
+    │   ├── filter/                    # Auth + encoding filters
+    │   ├── model/                     # Domain models
+    │   ├── service/                   # Business logic layer
+    │   └── util/                      # DB connection + config
+    ├── resources/
+    │   ├── db.properties.example      # Config template
+    │   └── schema.sql                 # MySQL schema + seed data
+    └── webapp/
+        ├── WEB-INF/
+        │   ├── web.xml
+        │   └── views/                 # JSP pages
+        └── css/style.css
 ```
 
 ---
 
-## Quick Start
+## AWS Infrastructure
 
-### Prerequisites
-- AWS Account with EC2 and RDS access
-- GitHub Account
-- Java 21
-- Maven 3.9
+| Resource | Name | Value |
+|---|---|---|
+| VPC | ecommerce-vpc | 10.0.0.0/16 |
+| Public Subnet 1 | ecommerce-public-subnet | 10.0.1.0/24 — ap-south-2a |
+| Public Subnet 2 | ecommerce-public-subnet-2 | 10.0.3.0/24 — ap-south-2b |
+| Private Subnet | ecommerce-private-subnet | 10.0.2.0/24 — ap-south-2a |
+| Internet Gateway | ecommerce-igw | Attached to VPC |
+| Jenkins EC2 | jenkins-server | t3.medium — Elastic IP |
+| Tomcat EC2 | tomcat-server | t3.small — Elastic IP |
+| Load Balancer | ecommerce-alb | Internet-facing — Port 80 |
+| Target Group | ecommerce-tg | Port 8080 — Health: /ecommerce-app/ |
+| Database | ecommerce-db | RDS MySQL 8.0 — Private subnet |
+
+### Security Groups
+
+| SG | Port | Source | Purpose |
+|---|---|---|---|
+| alb-sg | 80 | 0.0.0.0/0 | Public HTTP via ALB |
+| jenkins-sg | 8080 | 0.0.0.0/0 | Jenkins UI |
+| jenkins-sg | 22 | My IP | SSH only |
+| tomcat-sg | 8080 | alb-sg | App via ALB only |
+| tomcat-sg | 22 | My IP | SSH only |
+| rds-sg | 3306 | tomcat-sg | DB from app only |
+
+---
+
+## Quick Start
 
 ### 1. Clone the Repository
 ```bash
@@ -199,7 +232,7 @@ cp src/main/resources/db.properties.example src/main/resources/db.properties
 
 ### 3. Initialize Database
 ```bash
-mysql -h <RDS-ENDPOINT> -u admin -p < src/main/resources/schema.sql
+bash scripts/db-setup.sh <RDS-ENDPOINT> admin
 ```
 
 ### 4. Setup Jenkins Server
@@ -217,34 +250,30 @@ bash scripts/install-tomcat.sh
 mvn clean package -DskipTests
 ```
 
----
-
-## AWS Infrastructure
-
-| Resource | Name | Value |
-|---|---|---|
-| VPC | ecommerce-vpc | 10.0.0.0/16 |
-| Public Subnet 1 | ecommerce-public-subnet | 10.0.1.0/24 |
-| Public Subnet 2 | ecommerce-public-subnet-2 | 10.0.3.0/24 |
-| Private Subnet | ecommerce-private-subnet | 10.0.2.0/24 |
-| Jenkins EC2 | jenkins-server | t3.medium |
-| Tomcat EC2 | tomcat-server | t3.small |
-| Load Balancer | ecommerce-alb | Internet-facing |
-| Target Group | ecommerce-tg | Port 8080 |
-| Database | ecommerce-db | RDS MySQL 8.0 |
+For complete step-by-step instructions see [Setup Guide](docs/setup-guide.md).
 
 ---
 
-## Security Groups
+## Screenshots
 
-| SG Name | Port | Source | Purpose |
-|---|---|---|---|
-| alb-sg | 80 | 0.0.0.0/0 | ALB public access |
-| jenkins-sg | 8080 | 0.0.0.0/0 | Jenkins UI |
-| jenkins-sg | 22 | My IP | SSH |
-| tomcat-sg | 8080 | alb-sg | App via ALB only |
-| tomcat-sg | 22 | My IP | SSH |
-| rds-sg | 3306 | tomcat-sg | DB from app only |
+### Application UI
+| Home Page | Products |
+|---|---|
+| ![Home](screenshots/app-ui/home.png) | ![Products](screenshots/app-ui/products.png) |
+
+| Cart | Payment |
+|---|---|
+| ![Cart](screenshots/app-ui/cart.png) | ![Payment](screenshots/app-ui/payment.png) |
+
+### Jenkins CI/CD Pipeline
+| Pipeline Success | Stage View |
+|---|---|
+| ![Pipeline](screenshots/jenkins-pipeline/pipeline-success.png) | ![Stages](screenshots/jenkins-pipeline/pipeline-stages.png) |
+
+### AWS Infrastructure
+| EC2 Instances | ALB |
+|---|---|
+| ![EC2](screenshots/aws-infrastructure/ec2-instances.png) | ![ALB](screenshots/aws-infrastructure/alb.png) |
 
 ---
 
@@ -252,34 +281,25 @@ mvn clean package -DskipTests
 
 | Document | Description |
 |---|---|
-| [Setup Guide](docs/setup-guide.md) | Complete step-by-step setup |
-| [CI/CD Pipeline](docs/ci-cd-pipeline.md) | Pipeline stages explained |
-| [ALB Setup](docs/alb-setup.md) | Load balancer configuration |
-| [Infrastructure](docs/infrastructure.md) | AWS resource details |
+| [Setup Guide](docs/setup-guide.md) | Complete step-by-step AWS setup |
+| [CI/CD Pipeline](docs/ci-cd-pipeline.md) | Pipeline stages and configuration |
+| [ALB + RDS Setup](docs/alb-setup.md) | Load balancer and database setup |
+| [Infrastructure](docs/infrastructure.md) | AWS resource reference |
 
 ---
 
 ## Roadmap
 
 - [x] Three-tier VPC architecture on AWS
-- [x] Jenkins CI/CD pipeline with GitHub webhook
+- [x] Jenkins CI/CD pipeline with GitHub webhook auto-trigger
 - [x] Maven build + WAR deployment to Tomcat
-- [x] Application Load Balancer (ALB)
-- [x] Elastic IPs for stable server addresses
+- [x] Application Load Balancer with health checks
+- [x] Elastic IPs for stable server addressing
 - [x] Stripe payment integration
 - [x] BCrypt password security
-- [ ] AWS RDS MySQL (managed database)
+- [ ] AWS RDS MySQL (managed database tier)
 - [ ] HTTPS with AWS Certificate Manager (ACM)
 - [ ] Custom domain with Route 53
-
----
-
-## Built With AI Assistance
-
-This project was developed using **[Kiro](https://kiro.dev)** — an agentic AI software engineer
-integrated into the IDE. The entire application code, CI/CD pipeline, and infrastructure
-documentation were built through structured AI-assisted prompting, showcasing how modern
-DevOps workflows can be accelerated with AI tooling.
 
 ---
 
@@ -289,3 +309,8 @@ DevOps workflows can be accelerated with AI tooling.
 DevOps | Cloud | Java
 
 [![GitHub](https://img.shields.io/badge/GitHub-palurisravs1910-black?logo=github)](https://github.com/palurisravs1910)
+
+---
+
+*AI-assisted development tools were used to accelerate documentation and automation tasks.
+All infrastructure setup, validation, and deployment were implemented and verified by the author.*
