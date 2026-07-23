@@ -273,7 +273,7 @@ For complete step-by-step instructions see [Setup Guide](docs/setup-guide.md).
 ### Jenkins CI/CD Pipeline
 ![Jenkins Pipeline](screenshots/jenkins-pipeline/imgo.jpg)
 
-### AWS Infrastructure
+### AWS Target Group Health check
 ![AWS Infrastructure](screenshots/aws-infrastructure/imgo.jpg)
 
 ---
