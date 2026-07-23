@@ -288,8 +288,9 @@ For complete step-by-step instructions see [Setup Guide](docs/setup-guide.md).
 - [x] Stripe payment integration
 - [x] BCrypt password security
 - [x] AWS RDS MySQL (managed database tier)
-- [ ] HTTPS with AWS Certificate Manager (ACM)
-- [ ] Custom domain with Route 53
+- [x] Nginx reverse proxy with HTTPS (self-signed SSL)
+- [ ] Azure VM deployment (multi-cloud)
+- [ ] HTTPS with ACM (requires custom domain)
 
 ---
 

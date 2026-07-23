@@ -4,6 +4,17 @@ All notable changes to this project are documented here.
 
 ---
 
+## [1.4.0] - 2026-07-22
+
+### Added
+- Nginx reverse proxy installed on Tomcat EC2
+- Self-signed SSL certificate generated with OpenSSL
+- HTTPS enabled on port 443 via Nginx
+- HTTP :80 redirects to HTTPS :443 automatically
+- App accessible at https://16.112.90.159
+
+---
+
 ## [1.3.0] - 2026-07-22
 
 ### Added
