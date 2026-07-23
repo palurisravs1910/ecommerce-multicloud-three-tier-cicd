@@ -276,9 +276,6 @@ For complete step-by-step instructions see [Setup Guide](docs/setup-guide.md).
 ### AWS Infrastructure
 ![AWS Infrastructure](screenshots/aws-infrastructure/impo.png)
 
-### Kiro AI Assisted Development
-![Kiro AI](screenshots/kiro-ai/kiro.AI.png)
-
 ---
 
 ## Roadmap
