@@ -254,29 +254,6 @@ For complete step-by-step instructions see [Setup Guide](docs/setup-guide.md).
 
 ---
 
-## Screenshots
-
-### Application UI
-| Home Page | Products |
-|---|---|
-| ![Home](screenshots/app-ui/home.png) | ![Products](screenshots/app-ui/products.png) |
-
-| Cart | Payment |
-|---|---|
-| ![Cart](screenshots/app-ui/cart.png) | ![Payment](screenshots/app-ui/payment.png) |
-
-### Jenkins CI/CD Pipeline
-| Pipeline Success | Stage View |
-|---|---|
-| ![Pipeline](screenshots/jenkins-pipeline/pipeline-success.png) | ![Stages](screenshots/jenkins-pipeline/pipeline-stages.png) |
-
-### AWS Infrastructure
-| EC2 Instances | ALB |
-|---|---|
-| ![EC2](screenshots/aws-infrastructure/ec2-instances.png) | ![ALB](screenshots/aws-infrastructure/alb.png) |
-
----
-
 ## Documentation
 
 | Document | Description |
@@ -285,6 +262,22 @@ For complete step-by-step instructions see [Setup Guide](docs/setup-guide.md).
 | [CI/CD Pipeline](docs/ci-cd-pipeline.md) | Pipeline stages and configuration |
 | [ALB + RDS Setup](docs/alb-setup.md) | Load balancer and database setup |
 | [Infrastructure](docs/infrastructure.md) | AWS resource reference |
+
+---
+
+## Screenshots
+
+### Application UI
+![App UI](screenshots/app-ui/impo.png)
+
+### Jenkins CI/CD Pipeline
+![Jenkins Pipeline](screenshots/jenkins-pipeline/impo.png)
+
+### AWS Infrastructure
+![AWS Infrastructure](screenshots/aws-infrastructure/impo.png)
+
+### Kiro AI Assisted Development
+![Kiro AI](screenshots/kiro-ai/kiro.AI.png)
 
 ---
 
