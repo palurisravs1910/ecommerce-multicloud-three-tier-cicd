@@ -1,29 +1,25 @@
 // ============================================================
 // Jenkinsfile - E-Commerce CI/CD Pipeline
 // AWS Three-Tier Architecture
-// Stack: GitHub → Jenkins → Maven → WAR → Tomcat
+// Stack: GitHub → Jenkins → Maven → WAR → Tomcat (via ALB)
 // ============================================================
 
 pipeline {
 
     agent any
 
-    // ---- Tool Declarations ----
     tools {
         maven 'maven'
         jdk   'jdk-21'
     }
 
-    // ---- Pipeline-wide Environment Variables ----
     environment {
         APP_NAME        = 'ecommerce-app'
         WAR_FILE        = 'target/ecommerce-app.war'
-
-        // Tomcat on AWS (App Tier)
-        TOMCAT_AWS_URL  = 'http://16.112.90.159:8080/manager/text'
+        TOMCAT_AWS_URL  = "${env.TOMCAT_URL ?: 'http://16.112.90.159:8080/manager/text'}"
         TOMCAT_AWS_CRED = 'tomcat-aws-credentials'
-
         DEPLOY_PATH     = '/ecommerce-app'
+        ALB_DNS         = "${env.ALB_DNS ?: 'http://16.112.90.159:8080'}"
     }
 
     stages {
@@ -33,8 +29,9 @@ pipeline {
             steps {
                 echo '==> Checking out source code from GitHub...'
                 checkout scm
-                echo "==> Branch: ${env.GIT_BRANCH}"
-                echo "==> Commit: ${env.GIT_COMMIT}"
+                echo "==> Branch  : ${env.GIT_BRANCH}"
+                echo "==> Commit  : ${env.GIT_COMMIT}"
+                echo "==> Build # : ${env.BUILD_NUMBER}"
             }
         }
 
@@ -52,19 +49,19 @@ pipeline {
             }
         }
 
-        // ---- Stage 3: Archive WAR ----
+        // ---- Stage 3: Archive WAR Artifact ----
         stage('Archive Artifact') {
             steps {
                 echo '==> Archiving WAR artifact...'
                 archiveArtifacts artifacts: "${WAR_FILE}", fingerprint: true
-                echo "==> WAR archived: ${WAR_FILE}"
+                echo "==> WAR size: ${sh(script: "du -sh ${WAR_FILE} | cut -f1", returnStdout: true).trim()}"
             }
         }
 
         // ---- Stage 4: Deploy to AWS Tomcat ----
         stage('Deploy to AWS') {
             steps {
-                echo '==> Deploying to AWS Tomcat...'
+                echo '==> Deploying WAR to AWS Tomcat via Manager API...'
                 withCredentials([usernamePassword(
                     credentialsId: "${TOMCAT_AWS_CRED}",
                     usernameVariable: 'TOMCAT_USER',
@@ -77,18 +74,18 @@ pipeline {
                           --user "\${TOMCAT_USER}:\${TOMCAT_PASS}"
                     """
                 }
-                echo '==> AWS deployment complete.'
+                echo '==> Deployment to AWS Tomcat complete.'
             }
         }
 
-        // ---- Stage 5: Smoke Test ----
+        // ---- Stage 5: Smoke Test (via ALB) ----
         stage('Smoke Test') {
             steps {
-                echo '==> Running smoke test...'
+                echo '==> Running smoke test via ALB DNS...'
                 sh """
-                    sleep 10
+                    sleep 15
                     HTTP_CODE=\$(curl -s -o /dev/null -w "%{http_code}" \
-                        http://16.112.90.159:8080${DEPLOY_PATH}/)
+                        ${ALB_DNS}${DEPLOY_PATH}/)
                     if [ "\$HTTP_CODE" != "200" ]; then
                         echo "Smoke test FAILED - HTTP \$HTTP_CODE"
                         exit 1
@@ -100,13 +97,12 @@ pipeline {
 
     } // end stages
 
-    // ---- Post Actions ----
     post {
         success {
-            echo '==> Pipeline SUCCEEDED.'
+            echo "==> Pipeline SUCCEEDED. Build #${env.BUILD_NUMBER} deployed successfully."
         }
         failure {
-            echo '==> Pipeline FAILED.'
+            echo "==> Pipeline FAILED. Check console output for details."
         }
         always {
             echo '==> Cleaning workspace...'

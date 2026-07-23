@@ -1,0 +1,22 @@
+# ============================================================
+# Database Configuration Template
+# Copy this file to db.properties and fill in your values
+# NEVER commit db.properties to Git
+# ============================================================
+
+db.driver=com.mysql.cj.jdbc.Driver
+db.url=jdbc:mysql://<RDS-ENDPOINT>:3306/ecommerce_db?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
+db.username=<DB_USERNAME>
+db.password=<DB_PASSWORD>
+
+# Connection Pool Settings
+db.pool.maxSize=20
+db.pool.minIdle=5
+db.pool.connectionTimeout=30000
+
+# ============================================================
+# Stripe Configuration
+# Get your keys from https://dashboard.stripe.com/apikeys
+# ============================================================
+stripe.secret.key=sk_test_<YOUR_STRIPE_SECRET_KEY>
+stripe.publishable.key=pk_test_<YOUR_STRIPE_PUBLISHABLE_KEY>
