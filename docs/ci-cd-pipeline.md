@@ -19,7 +19,7 @@ git push → GitHub → Webhook → Jenkins → Maven → WAR → Tomcat → ALB
 
 ### Stage 2: Build & Test
 - Runs `mvn clean test package`
-- Compiles all 28 Java source files
+- Compiles all Java source files across controller, dao, service, model, filter, util packages
 - Executes JUnit tests
 - Packages the application as a WAR file (`ecommerce-app.war` ~14MB)
 - Publishes JUnit test results to Jenkins

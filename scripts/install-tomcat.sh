@@ -49,8 +49,15 @@ sudo tee ${INSTALL_DIR}/apache-tomcat-${TOMCAT_VERSION}/conf/tomcat-users.xml <<
 </tomcat-users>
 EOF
 
+# ---- First startup to extract webapps ----
+echo "[5/6] Starting Tomcat to extract webapps..."
+${INSTALL_DIR}/apache-tomcat-${TOMCAT_VERSION}/bin/startup.sh
+echo "Waiting 15 seconds for Tomcat to fully start and extract webapps..."
+sleep 15
+
 # ---- Allow Remote Manager Access ----
-echo "[5/6] Allowing remote access to Tomcat manager..."
+# Must run AFTER first startup so webapps/manager directory exists
+echo "[6/6] Allowing remote access to Tomcat manager..."
 sudo tee ${INSTALL_DIR}/apache-tomcat-${TOMCAT_VERSION}/webapps/manager/META-INF/context.xml << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <Context antiResourceLocking="false" privileged="true">
@@ -62,8 +69,9 @@ sudo tee ${INSTALL_DIR}/apache-tomcat-${TOMCAT_VERSION}/webapps/manager/META-INF
 </Context>
 EOF
 
-# ---- Start Tomcat ----
-echo "[6/6] Starting Tomcat..."
+# ---- Restart Tomcat to apply changes ----
+${INSTALL_DIR}/apache-tomcat-${TOMCAT_VERSION}/bin/shutdown.sh
+sleep 5
 ${INSTALL_DIR}/apache-tomcat-${TOMCAT_VERSION}/bin/startup.sh
 
 # ---- Summary ----
@@ -74,7 +82,8 @@ echo "============================================"
 echo " Java    : $(java -version 2>&1 | head -1)"
 echo " Tomcat  : ${TOMCAT_VERSION}"
 echo ""
-echo " Tomcat URL : http://$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4):8080"
-echo " Manager    : http://$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4):8080/manager"
+PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+echo " Tomcat URL : http://${PUBLIC_IP}:8080"
+echo " Manager    : http://${PUBLIC_IP}:8080/manager"
 echo " Deployer   : ${DEPLOYER_USER} / ${DEPLOYER_PASS}"
 echo "============================================"
